@@ -1,3 +1,12 @@
+#########################################
+# todo: add logging
+# https://docs.python.org/3/howto/logging.html
+# todo: add assert statements
+# https://wiki.python.org/moin/UsingAssertionsEffectively
+#########################################
+#import logging
+#logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
 assignments = []
 
 rows = 'ABCDEFGHI'
@@ -43,6 +52,11 @@ def assign_value(values, square, value):
 #       Branch out for each of those answers
 #       Create Tree of possible answers
 #       Traverse tree until we find ONE solution
+#
+#	todo: Its a good practice to modularize the code, 
+# 	naked_twins can be split up in two methods 
+#	find_twins, eliminate twins 
+#	to enhance readability.
 #
 #########################################
 def naked_twins(values):
@@ -90,6 +104,8 @@ def cross(A, B):
 squares         = cross(rows, cols)
 
 #prep for cleaner unitlist definition
+# todo: All utilities could be put in a 
+#		separate utils or initialization file.
 row_units       = [cross(r, cols)   for r in rows]
 column_units    = [cross(rows, c)   for c in cols]
 square_units    = [cross(rs, cs)    for rs in ('ABC','DEF','GHI')   for cs in ('123','456','789')]
@@ -98,7 +114,7 @@ diag1           = [[a[0]+a[1]       for a in zip(rows,cols)]]
 #A9, B8, C7, D6...I1
 diag2           = [[a[0]+a[1]       for a in zip(rows,cols[::-1])]]
 
-#top row A1 ... A9 bottom row I1 to I9
+#top row A1 to A9 bottom row I1 to I9 and diagnals
 unitlist        = row_units + column_units + square_units + diag1 + diag2
 
 # dictionary. ea square maps to list of units that have the square
@@ -129,6 +145,7 @@ def grid_values(grid):
         if c == '.':
             chars.append(digits)
     assert len(chars) == 81
+    #logging.info(dict(zip(squares, chars)))
     return dict(zip(squares, chars))
     
 
@@ -166,6 +183,10 @@ def display(values):
 #   Input:  sudoku dictionary
 #   Output: sudoku dictionary
 #
+#	todo: good practice to provide your method with a 
+#	docstring that helps in understanding the functioning of 
+#	the method. Please have a look at this link: 
+#	https://www.python.org/dev/peps/pep-0257/
 #########################################
 def eliminate(values):
     solved_values   = [square for square in values.keys() if len(values[square]) == 1]
@@ -219,12 +240,14 @@ def reduce_puzzle(values):
         solved_values_before = len([square for square in values.keys() if len(values[square]) == 1])
         values = eliminate(values)
         values = only_choice(values)
-        # values = naked_twins(values)
+        values = naked_twins(values)
         solved_values_after = len([square for square in values.keys() if len(values[square]) == 1])
         stalled = solved_values_before == solved_values_after
         if len([square for square in values.keys() if len(values[square]) == 0]):
             #print('Failed in reduce_puzzle')
             return False
+    #logging.basicConfig()
+    #logging.info('reduced values')
     return values
 
 
