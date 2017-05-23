@@ -3,12 +3,28 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-If a square has only one solution available, remove that solution from all peers of the square.
-If unit has only one place for a value, put the value in place. 
+A: My class notes: 
+Grid of 81 squares.
+Rows 1 to 9
+Columns A to I
+Unit is a Collection of 9 Squares
+
+If a square has only one solution (digit) available, remove that solution from all peers of the square.
+If unit has only one place for a value, put the value in that place.
+This is a good solution for simple puzzles.
+If two different squares can have the same value :
+	Banch out & consider options by creating tree with possible answers.
+		One branch might provide 3 or more options. 
+			Branch out and consider those options.
+				Traverse the tree to find A solution.
+I also added my notes as a comment in my code: solution.py
+
+
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-Same as constraint propogation above plus we iterate for the center diagonal peer squares.
+A: Same as constraint propogation above plus we iterate for the center diagonal peer squares.
+I defined unitlist in solution.py to consider all of a square's peers (next to, above, below and diagnal)
 
 ### Install
 
