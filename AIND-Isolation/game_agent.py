@@ -213,6 +213,7 @@ class MinimaxPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         # TODO: finish this function!
+        return get_legal_moves
         raise NotImplementedError
 
 
