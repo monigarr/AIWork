@@ -35,7 +35,16 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float(own_moves**2/(1+opp_moves))
 
 
 def custom_score_2(game, player):
@@ -61,7 +70,17 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float(own_moves/(1+opp_moves**2))
+
 
 
 def custom_score_3(game, player):
@@ -87,7 +106,16 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return 1.108*float(own_moves**2/(1+opp_moves))+0.972*float(own_moves/(1+opp_moves**2))
 
 
 class IsolationPlayer:
@@ -212,9 +240,38 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
         return self.minimax_search(game, depth)[1]
-        #raise NotImplementedError
+        
+    def minimax_search(self, game, depth, maximizing_player=True):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+            
+        legal_moves = game.get_legal_moves(game.active_player)
+
+
+        # return the score and the none move if reaches the max depth of no more legal moves
+        if depth <= 0 or len(legal_moves) == 0:
+            return self.score(game, self), (-1, -1)
+
+        # init the best value of min/max node
+        if maximizing_player:
+            best_value = [float("-inf"), legal_moves[0]]
+        else:
+            best_value = [float("inf"), legal_moves[0]]
+
+        # start searching
+        for move in legal_moves:
+            new_game = game.forecast_move(move)
+            old_value = best_value[0]
+            if maximizing_player:
+                best_value[0] = max(best_value[0], self.minimax_search(new_game, depth - 1, False)[0])
+            else:
+                best_value[0] = min(best_value[0], self.minimax_search(new_game, depth - 1, True)[0])
+            if best_value[0] != old_value:
+                best_value[1] = move
+
+        return best_value
+
 
 
 class AlphaBetaPlayer(IsolationPlayer):
@@ -256,22 +313,25 @@ class AlphaBetaPlayer(IsolationPlayer):
         self.time_left = time_left
 
         # TODO: finish this function!
+        
         legal_moves = game.get_legal_moves(game.active_player)
-        if not legal_moves:
+        if not legal_moves:  # if no legal moves
             return -1, -1
 
         next_move = random.choice(legal_moves)
-        # Iterative Deepening Search
-        depth_i = 1
+        depth_i = 1 # the iterative depth
         try:
-            while True:
-                next_move = self.alphabeta(game, depth = depth_i)
+            while True: # while time limit not reached
+                next_move = self.alphabeta(game, depth=depth_i)
                 depth_i += 1
         except SearchTimeout:
             return next_move
-
+            
         return next_move
+        
+        
 
+        
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
@@ -322,4 +382,117 @@ class AlphaBetaPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         # TODO: finish this function!
-        raise NotImplementedError
+        return self.alpha_beta_search(game, depth)[1]
+    
+    def alpha_beta_search(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+        
+        if game.utility(self) != 0.0:
+            return game.utility(self), (-1, -1)
+
+        # get the legal moves
+        legal_moves = game.get_legal_moves(game.active_player)
+
+
+        # if no more moves or reach the max depth
+        if len(legal_moves) == 0 or depth <= 0:
+            return self.score(game, self), (-1, -1)
+
+        if not maximizing_player:  # a min node
+            best_value = [beta, legal_moves[0]]
+            for move in legal_moves:
+                new_game = game.forecast_move(move)
+                old_value = best_value[0]
+                best_value[0] = min(best_value[0],
+                                 self.alpha_beta_search(new_game, depth - 1, alpha, best_value[0], True)[0])
+                if best_value[0] != old_value:
+                    best_value[1] = move
+                if best_value[0] <= alpha:  # pruning
+                    break
+
+        else:  # a max node
+            best_value = [alpha, legal_moves[0]]
+            for move in legal_moves:
+                new_game = game.forecast_move(move)
+                old_value = best_value[0]
+                best_value[0] = max(best_value[0],
+                                 self.alpha_beta_search(new_game, depth - 1, best_value[0], beta, False)[0],
+                                 )
+                if best_value[0] != old_value:
+                    best_value[1] = move
+                if best_value[0] >= beta:  # pruning
+                    break
+
+        return best_value
+    
+    def alpha_beta_search_1(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):
+        """Implement minimax search with alpha-beta pruning as described in the
+        lectures.
+        Parameters
+        ----------
+        game : isolation.Board
+            An instance of the Isolation game `Board` class representing the
+            current game state
+        depth : int
+            Depth is an integer representing the maximum number of plies to
+            search in the game tree before aborting
+        alpha : float
+            Alpha limits the lower bound of search on minimizing layers
+        beta : float
+            Beta limits the upper bound of search on maximizing layers
+        maximizing_player : bool
+            Flag indicating whether the current search depth corresponds to a
+            maximizing layer (True) or a minimizing layer (False)
+        Returns
+        ----------
+        float
+            The score for the current search branch
+        tuple(int, int)
+            The best move for the current branch; (-1, -1) for no legal moves
+        """
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        if depth == 0:
+             return self.score(game, self), (-1, -1)
+        if game.utility(self) != 0.0:
+            return game.utility(self), (-1, -1)
+        legal_moves=game.get_legal_moves()
+        best_move = legal_moves[0]
+        if maximizing_player:
+            # for each child node
+            for move in legal_moves:
+                child_game = game.forecast_move(move)
+                #get alpha value of child  -  child node is minimizing node
+                value, _ = self.alpha_beta_search(child_game, depth - 1,alpha,beta, maximizing_player=False)
+                #print(alpha,value, move)
+                #max(value,alpha)
+                if value > alpha:
+                    alpha = value
+                    best_move = move
+                # prune when alpha>= beta
+                if alpha >= beta:
+                    break
+
+            return alpha,best_move
+
+        else:
+            # for each child node
+            for move in legal_moves:
+                child_game = game.forecast_move(move)
+                # get beta value of child  -  child node is maximizing node
+                value, _ = self.alpha_beta_search(child_game, depth - 1, alpha, beta, maximizing_player=True)
+                # min(value,beta)
+
+                if value < beta:
+                    beta = value
+                    best_move = move
+
+                # prune when alpha>= beta
+
+                if alpha >= beta:
+                    break
+
+        return beta, best_move 
+        

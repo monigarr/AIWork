@@ -1,0 +1,12 @@
+{
+    "critiques": {
+        "680": {
+            "rubric_items": {
+                "5510": {
+                    "result": "failed",
+                    "observation": "{\n    \"15. Submission includes research_review.pdf\": {\n        \"traceback\": \"AssertionError: False is not true : You must submit a report named research_review.pdf for review.\\n\"\n    }, \n    \"14. Submission includes heuristic_analysis.pdf\": {\n        \"traceback\": \"AssertionError: False is not true : You must submit a report named heuristic_analysis.pdf for review.\\n\"\n    }\n}"
+                }
+            }
+        }
+    }
+}
