@@ -94,4 +94,8 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# zips and json
+.zip
+.json
+
 # End of https://www.gitignore.io/api/python
