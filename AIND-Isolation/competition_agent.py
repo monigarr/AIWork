@@ -11,6 +11,11 @@ class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
     pass
 
+def moves_available_chase_opponent(game,player):
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves / (1 + opp_moves ** 2))
+
 
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
@@ -33,7 +38,17 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    raise NotImplementedError
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves / (1 + opp_moves ** 2))
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    return moves_available_chase_opponent(game,player)
 
 
 class CustomPlayer:
@@ -94,4 +109,21 @@ class CustomPlayer:
             (-1, -1) if there are no available legal moves.
         """
         # OPTIONAL: Finish this function!
-        raise NotImplementedError
+        self.time_left = time_left
+
+        # TODO: finish this function!
+        
+        legal_moves = game.get_legal_moves(game.active_player)
+        if not legal_moves:  # if no legal moves
+            return -1, -1
+
+        next_move = random.choice(legal_moves)
+        depth_i = 1 # the iterative depth
+        try:
+            while True: # while time limit not reached
+                next_move = self.alphabeta(game, depth=depth_i)
+                depth_i += 1
+        except SearchTimeout:
+            return next_move
+            
+        return next_move

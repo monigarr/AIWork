@@ -1,0 +1,56 @@
+HEURISTIC EXPERIMENTS
+I only kept the top three of ten.  The dropped heuristics can be seen 
+in my github repo history in the game_agent.py file. 
+
+    												AB_Improved  *worst*
+looking_ahead   									AB_CUSTOM
+moves_available_chase_opponent  					AB_CUSTOM_2  *BEST* 70.75
+experiment_eight 									AB_CUSTOM_3
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+           Win Rate:      65.7%        70.0%        68.6%        65.7%  
+           Win Rate:      62.9%        65.7%        72.9%        67.1%  
+AVG WIN RATES:			  64.3%		   67.85%		70.75%		 66.4%
+BEST												  ***
+WORST					  ***
+
+-------------------------------------------------------------------------
+													AB_Improved  
+moves_available_chase_opponent 						AB_CUSTOM   *worst*
+aggressive_start_defensive_end  					AB_CUSTOM_2 *BEST* 74.3
+moves_available_defensive_two						AB_CUSTOM_3
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+           Win Rate:      62.9%        57.1%        74.3%        71.4% 
+           Win Rate:      72.9%        72.9%        75.7%        71.4% 
+           Win Rate:      72.9%        70.0%        72.9%        68.6%   
+AVG WIN RATES:			  69.56%	   66.66%		74.3%		 70.46%
+BEST												  ***
+WORST									 ***
+-------------------------------------------------------------------------
+													AB_Improved  *worst*
+aggressive_start_defensive_end						AB_CUSTOM
+moves_available_chase_opponent						AB_CUSTOM_2  *BEST 71.93
+moves_available_distance_to_center_negative			AB_CUSTOM_3
+           
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+           Win Rate:      71.4%        72.9%        72.9%        71.4% 
+           Win Rate:      65.7%        67.1%        74.3%        62.9%  
+           Win Rate:      71.4%        71.4%        68.6%        78.6%    
+ AVG WIN RATES:			  69.5%		   70.46%		71.93		 70.96%
+
+
+-------------------------------------------------------------------------
+													AB_IMPROVED  *2nd best*
+moves_available_chase_opponent						AB_CUSTOM  	 *best
+moves_available_defensive_start						AB_CUSTOM_2  *worse*
+moves_available_distance_to_center_negative			AB_CUSTOM_3  *3rd best*
+
+ Match #   Opponent    AB_Improved   AB_Custom   AB_Custom_2  AB_Custom_3 
+           Win Rate:      70.0%        74.3%        68.6%        68.6%  
+           Win Rate:      74.3%        74.3%        68.6%        62.9%    
+           Win Rate:      68.6%        67.1%        71.4%        71.4%    
+           Win Rate:      71.4%        70.0%        64.3%        81.4%    
+           Win Rate:      70.0%        71.4%        70.0%        65.7%    
+ AVG WIN RATES:			  70.8		   71.42		68.5		 70
