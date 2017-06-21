@@ -10,83 +10,11 @@ class SearchTimeout(Exception):
     pass
  
 
-
-# EXPERIMENT ONE
-def moves_available_defensive_one(game, player):
-    """how many moves does each player have left?
-    total_cells = all cells on board
-    total_cells - cells less at start of game & more at end of game
-    cells               more at start of game & less at end of game
-    """
-
-    total_cells = game.width ** 2
+def moves_available_chase_opponent(game,player):
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves / (1 + opp_moves ** 2))
 
-    cells = len(game.get_blank_spaces())
-
-    return float((total_cells - cells) * own_moves - cells * opp_moves)
-
-
-# EXPERIMENT TWO
-def moves_available_defensive_two(game,player):
-    """how many moves does each player have left?
-    total_cells = all cells on board
-    total_cells - cells less at start of game & more at end of game
-    cells               more at start of game & less at end of game
-    """
-
-    total_cells = game.width ** 2
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-
-    cells = len(game.get_blank_spaces())
-
-    return float(cells * own_moves - (total_cells - cells) * opp_moves)
-
-
-# EXPERIMENT THREE WIN RATE WHEN HIGHEST AGAINST OPPONENTS 75.7%
-def aggressive_start_defensive_end(game,player):
-
-    total_cells = game.width ** 2
-    cells = len(game.get_blank_spaces())
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-
-    if cells > 35:
-        return float(own_moves - 3 * opp_moves)
-    else:
-        return float(3 * own_moves - opp_moves)
-
-
-# EXPERIMENT FOUR
-# WIN RATE 70.32%
-def looking_ahead(game,player):
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
- 
-    return float(own_moves ** 2 / (1 + opp_moves))
-
-# EXPERIMENT FIVE
-def moves_available_distance_to_center_positive(game,player):
-    """ positive coefficient added to player's location"""
-    
-    center = game.width / 2
-    own_loc = len(game.get_player_location(player))
-    opp_loc = len(game.get_player_location(game.get_opponent(player)))  
-
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-
-    own_x = abs(center - own_loc[0])
-    opp_x = abs(center - opp_loc[1])
-
-    own_y = abs(center - own_loc[0])
-    opp_y = abs(center - opp_loc[1])
-
-    return float(10 * (own_moves - opp_moves) + (own_x + own_y) - (opp_x + opp_y))
-
-# EXPERIMENT SIX
 def moves_available_distance_to_center_negative(game,player):
     """ negative coefficient added to player's location"""
     center = game.width / 2
@@ -105,25 +33,26 @@ def moves_available_distance_to_center_negative(game,player):
 
     return float(10 * (own_moves - opp_moves) - (own_x + own_y) + (opp_x + opp_y))
 
+def moves_available_defensive_start(game,player):
+    """how many moves does each player have left?
+    total_cells = all cells on board
+    total_cells - cells less at start of game & more at end of game
+    cells               more at start of game & less at end of game
+    """
 
-# EXPERIMENT SEVEN WIN RATE WHEN HIGHEST AGAINST OPPONENTS 70.32%
-def moves_available_chase_opponent(game,player):
+    total_cells = game.width ** 2
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves / (1 + opp_moves ** 2))
 
-# EXPERIMENT EIGHT LOSER MOST OF THE TIME
-def experiment_eight(game,player):
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return 1.108 * float(own_moves ** 2 / (1 + opp_moves)) + 0.972 * float(own_moves / (1 + opp_moves ** 2))
+    cells = len(game.get_blank_spaces())
+
+    return float(cells * own_moves - (total_cells - cells) * opp_moves)
 
 
 #############################
 #   MY TOURNAMENT PLAYERS
 #############################
 
-# Win Rate 
 def custom_score(game, player):
 
     if game.is_loser(player):
@@ -132,9 +61,8 @@ def custom_score(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    return aggressive_start_defensive_end(game,player)
-
-# Best Win Rate   
+    return moves_available_chase_opponent(game,player)
+ 
 def custom_score_2(game, player):
     
     if game.is_loser(player):
@@ -143,9 +71,8 @@ def custom_score_2(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    return moves_available_chase_opponent(game,player)
+    return moves_available_distance_to_center_negative(game,player)
 
-# Win Rate
 def custom_score_3(game, player):
     
     if game.is_loser(player):
@@ -154,7 +81,8 @@ def custom_score_3(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    return moves_available_distance_to_center_negative(game,player)
+    return moves_available_defensive_start(game,player)
+
 
 
 class IsolationPlayer:
@@ -166,7 +94,6 @@ class IsolationPlayer:
 
 
 class MinimaxPlayer(IsolationPlayer):
-
     def get_move(self, game, time_left):
         self.time_left = time_left
 
@@ -244,15 +171,10 @@ class AlphaBetaPlayer(IsolationPlayer):
             
         return next_move
         
-        
-
-        
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
-
-        # TODO: finish this function!
         return self.alpha_beta_search(game, depth)[1]
     
     def alpha_beta_search(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):
@@ -307,6 +229,7 @@ class AlphaBetaPlayer(IsolationPlayer):
             return game.utility(self), (-1, -1)
         legal_moves=game.get_legal_moves()
         best_move = legal_moves[0]
+
         if maximizing_player:
             # for each child node
             for move in legal_moves:
@@ -335,9 +258,6 @@ class AlphaBetaPlayer(IsolationPlayer):
                 if value < beta:
                     beta = value
                     best_move = move
-
-                # prune when alpha>= beta
-
                 if alpha >= beta:
                     break
 
